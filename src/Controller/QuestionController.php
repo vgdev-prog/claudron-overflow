@@ -7,8 +7,10 @@ use App\Repository\QuestionRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -19,7 +21,7 @@ class QuestionController extends AbstractController
     public function homepage(QuestionRepository $repository): Response
     {
 
-        return $this->render('question/homepage.html.twig',[
+        return $this->render('question/homepage.html.twig', [
             'questions' => $repository->findAllAskedOrderByNewestAndNotNull()
         ]);
     }
@@ -30,40 +32,7 @@ class QuestionController extends AbstractController
     #[Route(path: '/questions/new', name: 'app_question_new', methods: ['GET', 'PATCH'])]
     public function new(EntityManagerInterface $entityManager, TagAwareCacheInterface $cache): Response
     {
-        $question = new Question();
-        $name = 'Missing Pants';
-        $question->setName($name);
-        $question->setSlug((implode('-', array_map('mb_strtolower',explode(' ', $name))) . '-' . random_int(0, 100)));
-
-        $question->setQuestion(<<<EOF
-        ---
-        Hi! So... I'm having a *weird* day. Yesterday, I cast a spell\
-        to make my dishes wash themselves. But while I was casting it,\
-        I slipped a little and I think `I also hit my pants with the spell`
-
-        When i woke up this morning, I caught a quick glimpse of my panths\
-        opening the front door and walking out! I've been out all afternoon\
-        (with no pants mind you) searching of them.
-
-        Does anyone have a spell to call your pants back?
-        EOF
-        );
-
-        if (random_int(1, 10) > 2) {
-            $question->setAskedAt(new DateTimeImmutable(sprintf('-%d days', random_int(1, 100))));
-        }
-
-        $entityManager->persist($question);
-        $entityManager->flush();
-
-        return new JsonResponse(
-            data: [
-                'id' => $question->getId(),
-                'name' => $question->getName(),
-                'slug' => $question->getSlug(),
-                'asked_at' => $question->getAskedAt()?->format('Y-m-d H:i:s'),
-            ]
-        );
+        return new Response('This will be migrated to fixtures');
     }
 
     #[Route('/questions/{slug}', name: 'app_question_show', methods: ['GET'])]
@@ -88,5 +57,23 @@ class QuestionController extends AbstractController
         ]);
     }
 
+    #[Route(path: '/questions/{slug}/vote', name: 'app_question_vote', methods: ['POST'])]
+    public function questionVote(
+        #[MapEntity(mapping: ['slug' => 'slug'])]
+        Question               $question,
+        Request                $request,
+        EntityManagerInterface $entityManager,
+    ): Response
+    {
+        $direction = $request->request->get('direction');
+        if ($direction === 'up') {
+            $question->upVotes();
+        } else if ($direction === 'down') {
+            $question->downVotes();
+        }
 
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_homepage');
+    }
 }

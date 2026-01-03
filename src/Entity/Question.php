@@ -28,7 +28,7 @@ class Question
     private ?\DateTimeImmutable $askedAt = null;
 
     #[ORM\Column]
-    private ?int $votes = null;
+    private ?int $votes = 0;
 
     public function getId(): ?int
     {
@@ -83,7 +83,7 @@ class Question
         return $this;
     }
 
-    public function getVotes(): ?int
+    public function getVotes(): int
     {
         return $this->votes;
     }
@@ -93,5 +93,26 @@ class Question
         $this->votes = $votes;
 
         return $this;
+    }
+
+    public function upVotes()
+    {
+        $this->votes++;
+    }
+
+    public function downVotes()
+    {
+        $this->votes--;
+    }
+
+    public function getVotesString():string
+    {
+        $votes = $this->getVotes();
+
+        return match (true) {
+            $votes > 0 => '+' . $votes,
+            $votes < 0 => (string) $votes,
+            default => '0',
+        };
     }
 }
