@@ -5,15 +5,30 @@ namespace App\Repository;
 use App\Entity\Question;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Cache\CacheItem;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @extends ServiceEntityRepository<Question>
  */
 class QuestionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        ManagerRegistry $registry,
+    private CacheInterface $cache,
+    )
     {
         parent::__construct($registry, Question::class);
+    }
+
+    public function findAllAskedOrderByNewestAndNotNull()
+    {
+           return $this->createQueryBuilder('q')
+                ->andWhere('q.askedAt IS NOT NULL')
+                ->orderBy('q.askedAt', 'DESC')
+                ->getQuery()
+                ->getResult();
     }
 
     //    /**

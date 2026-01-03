@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Question;
+use App\Repository\QuestionRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -10,16 +11,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class QuestionController extends AbstractController
 {
     #[Route('/', name: 'app_homepage', methods: ['GET'])]
-    public function homepage(EntityManagerInterface $entityManager): Response
+    public function homepage(QuestionRepository $repository): Response
     {
-        $questions = $entityManager->getRepository(Question::class)->findAll();
 
         return $this->render('question/homepage.html.twig',[
-            'questions' => $questions
+            'questions' => $repository->findAllAskedOrderByNewestAndNotNull()
         ]);
     }
 
@@ -27,12 +28,12 @@ class QuestionController extends AbstractController
      * @throws Exception
      */
     #[Route(path: '/questions/new', name: 'app_question_new', methods: ['GET', 'PATCH'])]
-    public function new(EntityManagerInterface $entityManager): Response
+    public function new(EntityManagerInterface $entityManager, TagAwareCacheInterface $cache): Response
     {
         $question = new Question();
         $name = 'Missing Pants';
         $question->setName($name);
-        $question->setSlug((implode('-', array_map('mb_strtolower',explode(' ', $name))) . '-' . rand(0, 100)));
+        $question->setSlug((implode('-', array_map('mb_strtolower',explode(' ', $name))) . '-' . random_int(0, 100)));
 
         $question->setQuestion(<<<EOF
         ---
@@ -48,8 +49,8 @@ class QuestionController extends AbstractController
         EOF
         );
 
-        if (rand(1, 10) > 2) {
-            $question->setAskedAt(new DateTimeImmutable(sprintf('-%d days', rand(1, 100))));
+        if (random_int(1, 10) > 2) {
+            $question->setAskedAt(new DateTimeImmutable(sprintf('-%d days', random_int(1, 100))));
         }
 
         $entityManager->persist($question);
