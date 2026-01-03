@@ -30,9 +30,15 @@ class CommentController extends AbstractController
 
     }
 
-    #[Route(path: '/comment')]
+    #[Route(path: '/comments')]
     public function index(): Response
     {
         return $this->render('comment/index.html.twig');
+    }
+
+    #[Route(path: '/comments')]
+    public function new()
+    {
+
     }
 }
