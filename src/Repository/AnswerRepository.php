@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Answer;
+use App\Enum\AnswerStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -15,6 +18,44 @@ class AnswerRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Answer::class);
     }
+    public static function createApprovedCriteria(): Criteria
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->eq('status', AnswerStatus::APPROVED));
+    }
+
+    /**
+     * @throws QueryException
+     */
+    public function findAllApproved(int $max = 10):array
+    {
+        return $this->createQueryBuilder('answer')
+            ->addCriteria(self::createApprovedCriteria())
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @throws QueryException
+     */
+    public function findMostPopular(?string $query): array
+    {
+        $qb = $this->createQueryBuilder('answer')
+            ->addCriteria(self::createApprovedCriteria())
+            ->innerJoin('answer.question', 'question')
+            ->addSelect('question')
+            ->orderBy('answer.votes', 'DESC')
+            ->setMaxResults(10);
+
+        if ($query) {
+            $qb->andWhere('answer.content LIKE :query OR question.name LIKE :query')
+                ->setParameter('query', '%'.$query.'%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
 
     //    /**
     //     * @return Answer[] Returns an array of Answer objects

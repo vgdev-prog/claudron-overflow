@@ -55,15 +55,18 @@
                                 </div>
                             </div>
                         </div>
-                        <a class="answer-link" href="{{ path('app_question_show', { slug: 'reversing-a-spell' }) }}"
+                        <a class="answer-link" href="{{ path('app_question_show', {slug: question.slug}) }}"
                            style="color: #fff;">
                             <p class="q-display-response text-center p-3">
-                                <i class="fa fa-magic magic-wand"></i> 6 answers
-                            </p>
+                                <i class="fa fa-magic magic-wand"></i> {{ question.answers|length }}</p>
                         </a>
                     </div>
                 </div>
             {% endfor %}
         </div>
+    </div>
+
+    <div>
+        111
     </div>
 {% endblock %}

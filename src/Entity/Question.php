@@ -2,16 +2,19 @@
 
 namespace App\Entity;
 
+use App\Enum\AnswerStatus;
+use App\Repository\AnswerRepository;
 use App\Repository\QuestionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
-#[ORM\Index(name: 'IDX_QUESTION_SLUG', columns: ['slug'],options: ['unique' => true])]
+#[ORM\Index(name: 'IDX_QUESTION_SLUG', columns: ['slug'], options: ['unique' => true])]
 class Question
 {
     use TimestampableEntity;
@@ -25,7 +28,7 @@ class Question
     private ?string $name = null;
 
     #[Gedmo\Slug(fields: ['name'])]
-    #[ORM\Column(length: 255,unique: true)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -40,7 +43,8 @@ class Question
     /**
      * @var Collection<int, Answer>
      */
-    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question')]
+    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(['createdAt' => 'DESC'])]
     private Collection $answers;
 
     public function __construct()
@@ -116,13 +120,13 @@ class Question
         $this->votes--;
     }
 
-    public function getVotesString():string
+    public function getVotesString(): string
     {
         $votes = $this->getVotes();
 
         return match (true) {
             $votes > 0 => '+' . $votes,
-            $votes < 0 => (string) $votes,
+            $votes < 0 => (string)$votes,
             default => '0',
         };
     }
@@ -134,6 +138,13 @@ class Question
     {
         return $this->answers;
     }
+
+    public function getApprovedAnswers(): Collection
+    {
+        return $this->answers->matching(AnswerRepository::createApprovedCriteria());
+    }
+
+
 
     public function addAnswer(Answer $answer): static
     {

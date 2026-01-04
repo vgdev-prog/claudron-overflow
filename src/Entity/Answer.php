@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use App\Enum\AnswerStatus;
 use App\Repository\AnswerRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -38,6 +40,9 @@ class Answer
         options: ['comment' => 'id of question']
     )]
     private Question $question;
+
+    #[ORM\Column(enumType: AnswerStatus::class)]
+    private AnswerStatus $status = AnswerStatus::PENDING;
 
     public function getId(): ?int
     {
@@ -91,4 +96,17 @@ class Answer
 
         return $this;
     }
+
+    public function getStatus(): AnswerStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(AnswerStatus $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
 }

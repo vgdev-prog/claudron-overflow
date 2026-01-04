@@ -3,6 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\Answer;
+use App\Enum\AnswerStatus;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
 /**
@@ -37,6 +38,7 @@ final class AnswerFactory extends PersistentProxyObjectFactory
             'content' => self::faker()->text(),
             'username' => self::faker()->userName(),
             'votes' => self::faker()->numberBetween(-20,50),
+            'status' => self::faker()->randomElement(AnswerStatus::cases()),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime('-1 year')),
             'question' => QuestionFactory::random(),
         ];

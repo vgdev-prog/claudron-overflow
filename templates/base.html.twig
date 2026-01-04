@@ -12,15 +12,30 @@
 
     </head>
     <body>
-       <nav class="navbar navbar-light bg-light" style="height: 100px;">
-           <div class="px-3 w-100 d-flex justify-content-between">
-               <a class="navbar-brand" href="{{ path('app_homepage') }}">
-                   <i style="color: #444; font-size: 2rem;" class="pb-1 fad fa-cauldron"></i>
-                   <p class="ps-2 d-inline fw-bold" style="color: #444;">Cauldron Overflow</p>
-               </a>
-               <button class="btn btn-dark">Sign up</button>
-           </div>
-       </nav>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="height: 100px;">
+        <div class="container-fluid px-3">
+            <a class="navbar-brand" href="{{ path('app_homepage') }}">
+                <i style="color: #444; font-size: 2rem;" class="pb-1 fad fa-cauldron"></i>
+                <span class="ps-2 fw-bold" style="color: #444;">Cauldron Overflow</span>
+            </a>
+
+            <!-- Toggler для мобильных -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Меню (скрывается на мобильных) -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_answers_popular') }}">Answers</a>
+                    </li>
+                </ul>
+            </div>
+
+            <button class="btn btn-dark">Sign up</button>
+        </div>
+    </nav>
 
 
         <main class="px-3">

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Answer;
+use App\Repository\AnswerRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\QueryException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AnswerController extends AbstractController
@@ -30,5 +33,19 @@ class AnswerController extends AbstractController
             'votes' => $answer->getVotes(),
         ]);
 
+    }
+
+    /**
+     * @throws QueryException
+     */
+    #[Route('/answers/popular', name: 'app_answers_popular', methods: ['GET'])]
+    public function popularAnswers(AnswerRepository $answerRepository, Request $request): Response
+    {
+        $query = $request->query->get('q');
+
+        $answers = $answerRepository->findMostPopular($query);
+        return $this->render('answer/popular.html.twig', [
+            'answers' => $answers,
+        ]);
     }
 }
