@@ -4,12 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Question;
 use App\Repository\QuestionRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -45,15 +43,8 @@ class QuestionController extends AbstractController
             throw $this->createNotFoundException('Question not found');
         }
 
-        $answers = [
-            'Make sure  your  cat is sitting purrfectcly still',
-            'Honestly, I like furry shoes better than MY cat',
-            'Maybe... Try saying spell backwards?'
-        ];
-
         return $this->render('question/show.html.twig', [
             'question' => $question,
-            'answers' => $answers
         ]);
     }
 
