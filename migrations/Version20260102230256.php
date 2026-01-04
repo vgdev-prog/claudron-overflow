@@ -19,14 +19,12 @@ final class Version20260102230256 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE UNIQUE INDEX UNIQ_B6F7494E989D9B62 ON question (slug)');
         $this->addSql('CREATE INDEX IDX_QUESTION_SLUG ON question (slug)');
     }
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('DROP INDEX UNIQ_B6F7494E989D9B62 ON question');
         $this->addSql('DROP INDEX IDX_QUESTION_SLUG ON question');
     }
