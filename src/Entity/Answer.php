@@ -12,6 +12,9 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 #[ORM\Index(name: 'answer_question_id_index', columns: ['question_id'])]
 class Answer
 {
+    const VOTE_UP = 'up';
+    const VOTE_DOWN = 'down';
+
     use TimestampableEntity;
     #[ORM\Id]
     #[ORM\GeneratedValue]
