@@ -50,12 +50,8 @@ final class QuestionFactory extends PersistentProxyObjectFactory
     protected function initialize(): static
     {
         return $this
-             ->afterInstantiate(function(Question $question): void {
-                 if (!$question->getSlug()) {
-                     $slugger = new AsciiSlugger();
-                     $question->setSlug(mb_strtolower($slugger->slug($question->getName())));
-                 }
-             })
+//             ->afterInstantiate(function(Question $question): void {
+//             })
         ;
     }
 
